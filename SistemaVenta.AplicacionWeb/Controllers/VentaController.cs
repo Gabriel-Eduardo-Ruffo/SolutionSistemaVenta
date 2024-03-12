@@ -4,6 +4,10 @@ using SistemaVenta.AplicacionWeb.Models.ViewModels;
 using SistemaVenta.AplicacionWeb.Utilidades.Response;
 using SistemaVenta.BLL.Interfaces;
 using SistemaVenta.Entity;
+
+using DinkToPdf;
+using DinkToPdf.Contracts;
+
 using NuGet.Protocol.Plugins;
 
 namespace SistemaVenta.AplicacionWeb.Controllers
@@ -14,17 +18,20 @@ namespace SistemaVenta.AplicacionWeb.Controllers
         private readonly IVentaService _ventaServicio;
         private readonly IMapper _mapper;
 
+        private readonly IConverter _converter;
+
         /// <summary>
         /// constructor de Venta Controller
         /// </summary>
         /// <param name="tipoDocumentoVentaServicio"></param>
         /// <param name="ventaServicio"></param>
         /// <param name="mapper"></param>
-        public VentaController(ITipoDocumentoVentaService tipoDocumentoVentaServicio, IVentaService ventaServicio, IMapper mapper)
+        public VentaController(ITipoDocumentoVentaService tipoDocumentoVentaServicio, IVentaService ventaServicio, IMapper mapper, IConverter converter)
         {
             _tipoDocumentoVentaServicio = tipoDocumentoVentaServicio;
             _ventaServicio = ventaServicio;
             _mapper = mapper;
+            _converter = converter;//viene de la libreria DinkToPDF
         }
 
         public IActionResult NuevaVenta()
@@ -80,6 +87,31 @@ namespace SistemaVenta.AplicacionWeb.Controllers
         {
             List<VMVenta> vmHistorialVenta = _mapper.Map<List<VMVenta>>(await _ventaServicio.Historial(numeroVenta, fechaInicio, fechaFin));
             return StatusCode(StatusCodes.Status200OK, vmHistorialVenta);
+        }
+
+        public IActionResult MostrarPDFVenta(string numeroVenta)
+        {
+            string urlPlantillaVista = $"{this.Request.Scheme}://{this.Request.Host}/Plantilla/PDFVenta?numeroVenta={numeroVenta}";
+
+            var pdf = new HtmlToPdfDocument()
+            {
+                GlobalSettings = new GlobalSettings
+                {
+                    PaperSize = PaperKind.A4,
+                    Orientation = Orientation.Portrait,
+                },
+                Objects =
+                {
+                    new ObjectSettings()
+                    {
+                        Page = urlPlantillaVista
+                    }
+                }
+            };
+
+            var archivoPDF = _converter.Convert(pdf);
+
+            return File(archivoPDF, "application/pdf");
         }
     }
 }

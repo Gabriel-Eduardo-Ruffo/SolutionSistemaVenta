@@ -1,5 +1,8 @@
 using SistemaVenta.AplicacionWeb.Utilidades.Automapper;
 using SistemaVenta.IOC;
+using SistemaVenta.AplicacionWeb.Utilidades.Extensiones;
+using DinkToPdf;
+using DinkToPdf.Contracts;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +14,12 @@ builder.Services.InyectarDependencias(builder.Configuration);
 
 //Inyectamos la dependencia AutoMapper y la clase donde se configuro la conversion de models a ViewModels o viceversa
 builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
+
+//Uso de libreria externa para poder crear PDF
+var context = new CustomAssemblyLoadContext();
+context.LoadUnmanagedLibrary(Path.Combine(Directory.GetCurrentDirectory(), "Utilidades/LibreriaPDF/libwkhtmltox.dll"));
+//context.LoadUnmanagedLibrary("C:/Users/ace_c/Documents/ProyectosC#/SolutionSistemaVenta/SistemaVenta.AplicacionWeb/Utilidades/LibreriaPDF/libwkhtmltox.dll");
+builder.Services.AddSingleton(typeof(IConverter),new SynchronizedConverter(new PdfTools()));
 
 var app = builder.Build();
 

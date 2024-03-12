@@ -2,7 +2,7 @@
 {
     public class VMPDFVenta
     {
-        public VMNegocio? Negocio { get; set; }
-        public VMVenta? Venta { get; set;}
+        public VMNegocio? negocio { get; set; }
+        public VMVenta? venta { get; set;}
     }
 }
