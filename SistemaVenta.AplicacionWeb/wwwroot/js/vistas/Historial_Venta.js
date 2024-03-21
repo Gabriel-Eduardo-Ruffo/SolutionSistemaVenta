@@ -43,7 +43,7 @@ $(document).ready(function () {
     $.datepicker.setDefaults($.datepicker.regional["es"])
 
     $("#txtFechaInicio").datepicker({dateFormat: "dd/mm/yy"});
-    $("#txtFechaFin").datepicker({ dateFormat: "dd/mm/yy" });;
+    $("#txtFechaFin").datepicker({ dateFormat: "dd/mm/yy" });
 })
 
 $("#cboBuscarPor").change(function () {
