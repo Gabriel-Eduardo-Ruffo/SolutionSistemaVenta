@@ -58,6 +58,9 @@ namespace SistemaVenta.IOC
 
             //Inserta el repositorio de Venta
             services.AddScoped<IVentaService, VentaService>();
+
+            //Inserta el repositorio de DashBoard
+            services.AddScoped<IDashBoardService, DasBoardService>();
         }
     }
 }
