@@ -37,7 +37,7 @@ namespace SistemaVenta.DAL.Implementacion
                 TEntity entidad = await _dbContext.Set<TEntity>().FirstOrDefaultAsync(filtro);
                 return entidad;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 throw;
             }
@@ -56,7 +56,7 @@ namespace SistemaVenta.DAL.Implementacion
                 await _dbContext.SaveChangesAsync();//guarda en DB
                 return entidad;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 throw;
             }
@@ -75,7 +75,7 @@ namespace SistemaVenta.DAL.Implementacion
                 await _dbContext.SaveChangesAsync();//guarda en DB
                 return true;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 throw;
             }
@@ -94,7 +94,7 @@ namespace SistemaVenta.DAL.Implementacion
                 await _dbContext.SaveChangesAsync();
                 return true;
             }
-            catch (Exception)
+            catch (Exception ex)
             { 
                 throw;
             }
