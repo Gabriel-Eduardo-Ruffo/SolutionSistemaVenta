@@ -23,8 +23,14 @@ namespace SistemaVenta.AplicacionWeb.Controllers
         {
             ClaimsPrincipal claimUser = HttpContext.User;
 
-            if (claimUser.Identity.IsAuthenticated) 
+            if (claimUser.Identity.IsAuthenticated)
                 return RedirectToAction("Index", "Home");
+
+            return View();
+        }
+
+        public IActionResult ReestablecerClave()
+        {
 
             return View();
         }
@@ -56,12 +62,38 @@ namespace SistemaVenta.AplicacionWeb.Controllers
                 IsPersistent = modelo.MantenerSesion,
             };
 
-            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, 
+            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
                                           new ClaimsPrincipal(claimsIdentity),
                                           properties
                                           );
 
-            return RedirectToAction("Index","Home");
+            return RedirectToAction("Index", "Home");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ReestablecerClave(VMUsuarioLogin modelo)
+        {
+            try
+            {
+                string urlPlantillaCorreo = $"{this.Request.Scheme}://{this.Request.Host}/Plantilla/ReestablecerClave?clave=[clave]";
+                bool resultado = await _usuarioServicio.ReestablecerClave(modelo.Correo, urlPlantillaCorreo);
+                if (resultado) 
+                {
+                    ViewData["Mensaje"] = "Su contraseña fue reestablecida, revise su correo";
+                    ViewData["MensajeError"] = null;
+                }
+                else 
+                {
+                    ViewData["Mensaje"] = null;
+                    ViewData["MensajeError"] = "Hubo un problema, Intentelo nuevamente mas tarde";
+                }
+            }
+            catch (Exception ex)
+            {
+                ViewData["Mensaje"] = null;
+                ViewData["MensajeError"] = ex.Message;
+            }
+            return View();
         }
     }
 }
