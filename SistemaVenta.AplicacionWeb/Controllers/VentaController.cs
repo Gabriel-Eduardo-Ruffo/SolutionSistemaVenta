@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+
 using AutoMapper;
 using SistemaVenta.AplicacionWeb.Models.ViewModels;
 using SistemaVenta.AplicacionWeb.Utilidades.Response;
@@ -10,8 +12,10 @@ using DinkToPdf.Contracts;
 
 using NuGet.Protocol.Plugins;
 
+
 namespace SistemaVenta.AplicacionWeb.Controllers
 {
+    [Authorize]
     public class VentaController : Controller
     {
         private readonly ITipoDocumentoVentaService _tipoDocumentoVentaServicio;

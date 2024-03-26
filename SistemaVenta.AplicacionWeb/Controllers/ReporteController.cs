@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 using AutoMapper;
 using SistemaVenta.AplicacionWeb.Models.ViewModels;
@@ -6,9 +7,9 @@ using SistemaVenta.BLL.Interfaces;
 
 namespace SistemaVenta.AplicacionWeb.Controllers
 {
+    [Authorize]
     public class ReporteController : Controller
     {
-
         private readonly IMapper _mapper;
         private readonly IVentaService _ventaServicio;
 

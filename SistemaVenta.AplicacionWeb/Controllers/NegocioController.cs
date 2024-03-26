@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 using AutoMapper;
 using Newtonsoft.Json;
@@ -10,6 +11,7 @@ using SistemaVenta.Entity;
 
 namespace SistemaVenta.AplicacionWeb.Controllers
 {
+    [Authorize]
     public class NegocioController : Controller
     {
         private readonly IMapper _mapper;
