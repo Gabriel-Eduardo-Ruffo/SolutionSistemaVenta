@@ -6,6 +6,11 @@ using SistemaVenta.AplicacionWeb.Models;
 using System.Diagnostics;
 
 using System.Security.Claims;
+using AutoMapper;
+using SistemaVenta.AplicacionWeb.Models.ViewModels;
+using SistemaVenta.AplicacionWeb.Utilidades.Response;
+using SistemaVenta.BLL.Interfaces;
+using SistemaVenta.Entity;
 
 namespace SistemaVenta.AplicacionWeb.Controllers
 {
@@ -14,11 +19,21 @@ namespace SistemaVenta.AplicacionWeb.Controllers
     {
         private readonly ILogger<HomeController> _logger;
 
+        private readonly IUsuarioService _usuarioServicio;
+        private readonly IMapper _mapper;
+
+        public HomeController(IUsuarioService usuarioServicio, IMapper mapper)
+        {
+            _usuarioServicio = usuarioServicio;
+            _mapper = mapper;
+        }
+
+        /*
         public HomeController(ILogger<HomeController> logger)
         {
             _logger = logger;
         }
-
+        */
         public IActionResult Index()
         {
             return View();
@@ -32,6 +47,76 @@ namespace SistemaVenta.AplicacionWeb.Controllers
         public IActionResult Perfil()
         {
             return View();
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ObtenerUsuario()
+        {
+            GenericResponse<VMUsuario> response = new GenericResponse<VMUsuario>();
+            try
+            {
+                ClaimsPrincipal claimUser = HttpContext.User;
+                
+                string idUsusario = claimUser.Claims.Where(claims => claims.Type == ClaimTypes.NameIdentifier).Select(c => c.Value).SingleOrDefault();
+                
+                VMUsuario usuario = _mapper.Map<VMUsuario>(await _usuarioServicio.ObtenerPorId(int.Parse(idUsusario)));
+
+                response.Estado = true;
+                response.Objeto = usuario;
+
+            }
+            catch (Exception ex)
+            {
+                response.Estado =false;
+                response.Mensaje = ex.Message;
+            }
+            return StatusCode(StatusCodes.Status200OK, response);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> GuardarPerfil([FromBody] VMUsuario modelo)
+        {
+            GenericResponse<VMUsuario> response = new GenericResponse<VMUsuario>();
+            try
+            {
+                ClaimsPrincipal claimUser = HttpContext.User;
+                string idUsusario = claimUser.Claims.Where(claims => claims.Type == ClaimTypes.NameIdentifier).Select(c => c.Value).SingleOrDefault();
+
+                Usuario entidad = _mapper.Map<Usuario>(modelo);
+
+                entidad.IdUsuario = int.Parse(idUsusario);
+
+                bool resultado = await _usuarioServicio.GuardarPerfil(entidad);
+
+                response.Estado = resultado;
+            }
+            catch (Exception ex)
+            {
+                response.Estado = false;
+                response.Mensaje = ex.Message;
+            }
+            return StatusCode(StatusCodes.Status200OK, response);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CambiarClave([FromBody] VMCambiarClave modelo)
+        {
+            GenericResponse<bool> response = new GenericResponse<bool>();
+            try
+            {
+                ClaimsPrincipal claimUser = HttpContext.User;
+                string idUsusario = claimUser.Claims.Where(claims => claims.Type == ClaimTypes.NameIdentifier).Select(c => c.Value).SingleOrDefault();
+
+                bool resultado = await _usuarioServicio.CambiarClave(int.Parse(idUsusario), modelo.ClaveActual, modelo.ClaveNueva);
+
+                response.Estado = resultado;
+            }
+            catch (Exception ex)
+            {
+                response.Estado = false;
+                response.Mensaje = ex.Message;
+            }
+            return StatusCode(StatusCodes.Status200OK, response);
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
