@@ -11,7 +11,7 @@ using DinkToPdf;
 using DinkToPdf.Contracts;
 
 using NuGet.Protocol.Plugins;
-
+using System.Security.Claims;
 
 namespace SistemaVenta.AplicacionWeb.Controllers
 {
@@ -68,7 +68,11 @@ namespace SistemaVenta.AplicacionWeb.Controllers
 
             try
             {
-                modelo.IdUsuario = 1;//Esta parte del usuario es provisorio hasta que agreguemos el sistema de logueo
+                ClaimsPrincipal claimUser = HttpContext.User;
+
+                string idUsusario = claimUser.Claims.Where(claims => claims.Type == ClaimTypes.NameIdentifier).Select(c => c.Value).SingleOrDefault();
+
+                modelo.IdUsuario = int.Parse(idUsusario);
 
                 //pasamos del modelo VMVenta recibido a Venta
                 Venta ventaCreada = await _ventaServicio.Registrar(_mapper.Map<Venta>(modelo));
